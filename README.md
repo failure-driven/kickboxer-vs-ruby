@@ -14,3 +14,15 @@
   and CRuby
 - [ ] Finally, a demonstration of the sparing robot will be performed live on
   stage
+
+## Progress
+
+- [ ] concept demo using sockets [apps/demo_using_sockets](apps/demo_using_sockets)
+- [ ] switch to MQTT server like https://mosquitto.org/ OR https://www.hivemq.com/
+- [ ] write Arduion/ESP32 code to move a servo
+    - BUT CAN IT RUBY? - take a look at mruby on ESP32
+- [ ] write a basic frontend for Android to connect to MQTT server
+    - BUT CAN IT RUBY?
+    - look at http://www.rubymotion.com/ and https://dragonruby.org/ and
+      https://github.com/ruboto/ruboto (actual JRuby)
+

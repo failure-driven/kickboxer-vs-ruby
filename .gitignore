@@ -1,0 +1,8 @@
+.ideas
+
+Brewfile.lock.json
+rubocop_cache
+
+.irb_history
+
+.DS_Store

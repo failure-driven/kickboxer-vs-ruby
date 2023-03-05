@@ -1,0 +1,30 @@
+name: "Build Kickboxer vs Ruby"
+
+on:
+  push:
+    paths:
+    - "./"
+  schedule:
+    - cron: "0 22 * * *" # daily run at 22:00 UTC ~ 8am Melbourne time
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2
+          bundler-cache: true
+          working-directory: ./
+
+      - name: make build
+        working-directory: ./
+        run: |
+          make build
+

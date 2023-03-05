@@ -21,8 +21,16 @@ asdf-install:
 .PHONY: install
 install: asdf-install check-tools
 
+.PHONY: rubocop-fix
+rubocop-fix:
+	bundle exec rubocop -A
+
+.PHONY: rubocop
+rubocop:
+	bundle exec rubocop
+
 .PHONY: build
-	echo "no build yet"
+build: rubocop
 
 .PHONY: usage
 usage:
@@ -37,4 +45,7 @@ usage:
 	@echo "${YELLOW}make build${NC}        run the build"
 	@echo
 	@echo "Development"
+	@echo
+	@echo "${YELLOW}make rubocop${NC}      rubocop"
+	@echo "${YELLOW}make rubocop-fix${NC}  rubocop fix"
 	@echo
