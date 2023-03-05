@@ -25,4 +25,5 @@ AllCops:
   MaxFilesInCache: 10000
   Exclude:
     - "vendor/**/*"
+    - "**/Brewfile"
 

@@ -1,0 +1,4 @@
+# mange dependencies with brew https://brew.sh/
+
+brew "colima"         # Container runtimes on MacOS (and Linux) with minimal setup
+brew "tmux"           # Terminal multiplexer
