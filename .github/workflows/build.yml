@@ -2,8 +2,6 @@ name: "Build Kickboxer vs Ruby"
 
 on:
   push:
-    paths:
-    - "./"
   schedule:
     - cron: "0 22 * * *" # daily run at 22:00 UTC ~ 8am Melbourne time
   workflow_dispatch:
