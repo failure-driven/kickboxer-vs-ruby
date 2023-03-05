@@ -1,5 +1,19 @@
 # Demo using sockets
 
+## Using tmux
+
+```sh
+make
+# in client type
+hit port: 4445
+CTRL-D
+```
+
+also `make demo-attach` to reattach to tmux when in background and `make
+demo-down` to kill the tmux session.
+
+## Manually
+
 setup a server, client and device
 
 ```sh
@@ -29,3 +43,13 @@ hitting device on port 4445
 # device
 hit from client
 ```
+
+## Troubleshooting
+
+if you can't find where the socket server is running or it didn't stop properly
+you can find what is listening on that port and kill the associated process
+
+```sh
+lsof -i :4444 -nP -sTCP:LISTEN
+```
+

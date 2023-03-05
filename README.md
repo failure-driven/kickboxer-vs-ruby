@@ -20,7 +20,7 @@ https://github.com/failure-driven/kickboxer-vs-ruby/actions/workflows/build.yml)
 
 ## Progress
 
-- [ ] concept demo using sockets [apps/demo_using_sockets](apps/demo_using_sockets)
+- [x] concept demo using sockets [apps/demo_using_sockets](apps/demo_using_sockets)
 - [ ] switch to MQTT server like https://mosquitto.org/ OR https://www.hivemq.com/
 - [ ] write Arduion/ESP32 code to move a servo
     - BUT CAN IT RUBY? - take a look at mruby on ESP32
