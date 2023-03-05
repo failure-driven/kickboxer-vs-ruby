@@ -23,4 +23,6 @@ AllCops:
   UseCache: true
   CacheRootDirectory: .
   MaxFilesInCache: 10000
+  Exclude:
+    - "vendor/**/*"
 

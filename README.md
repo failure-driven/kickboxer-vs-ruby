@@ -1,5 +1,8 @@
 # Kickboxer vs Ruby
 
+[![Build Kickboxer vs Ruby](https://github.com/failure-driven/kickboxer-vs-ruby/actions/workflows/build.yml/badge.svg)](
+https://github.com/failure-driven/kickboxer-vs-ruby/actions/workflows/build.yml)
+
 ## Goals
 
 - [ ] long journey of ups and downs
