@@ -1,0 +1,93 @@
+#!/usr/bin/env zsh
+
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+NOT_OK=false
+
+if [[ ! $ASDF_DIR =~ asdf ]]
+then
+  echo -e "🟡  ${YELLOW}seems asdf is NOT being used or is NOT setup ¯\_(ツ)_/¯${NC}"
+else
+  echo -e "✅ ${GREEN}adsf installed${NC}"
+fi
+
+while read tool_version
+do
+  toolname=$(echo ${tool_version} | cut -d " " -f 1)
+
+  if [[ $ASDF_DIR =~ asdf ]]
+    then
+    if [[ ! $(asdf plugin list | grep ${toolname}) ]]
+    then
+      echo -e "🟡  ${YELLOW}missing asdf plugin ${toolname}${NC}"
+    fi
+  fi
+
+  toolname_exec=${toolname}
+  toolname_version="-v"
+
+  if [[ ${toolname} == "nodejs" ]]
+  then
+    toolname_exec="node"
+  fi
+  if [[ ${toolname} == "postgres" ]]
+  then
+    toolname_exec="psql"
+    toolname_version="--version"
+  fi
+
+  current_version=$(${toolname_exec} ${toolname_version})
+  expected_version=$(grep "${toolname}" .tool-versions | cut -d " " -f 2)
+
+  if [[ ${current_version} != *"${expected_version}"* ]]
+  then
+    if [[ ${toolname} == postgres ]]
+    then
+      echo -e "🟡  close enough ${YELLOW} running ${current_version} but expected ${expected_version}${NC}"
+    else
+      echo -e "❌  ${RED}expected your environment to have ${toolname} ${expected_version} but found ${current_version}${NC}"
+      NOT_OK=true
+    fi
+  else
+    echo -e "✅ ${GREEN}found expected version of ${toolname} ${expected_version}${NC}"
+  fi
+done < .tool-versions
+
+# echo -e "checking the version of postgres running"
+# server_postgres_version=$(psql -p 5442 postgres -c 'SELECT version()' | grep PostgreSQL | cut -d " " -f 3)
+# expected_postgres_version=$(grep postgres .tool-versions | cut -d " " -f 2)
+# if [[ "$server_postgres_version" != "$expected_postgres_version" ]]; then
+#   if [[ $(echo "$server_postgres_version" | cut -d "." -f 1) == $(echo "$expected_postgres_version" | cut -d "." -f 1) ]]; then
+#     echo -e "🟡  ${YELLOW} close enough running ${server_postgres_version} but expected ${expected_postgres_version}${NC}"
+#   else
+#     echo -e "❌  ${RED}expected your environment to be running postgres \
+# ${expected_postgres_version} but found ${server_postgres_version}${NC}"
+#     echo -e "${RED}  make sure you are runnikng ${expected_postgres_version}${NC}"
+#     NOT_OK=true
+#   fi
+# else
+#   echo -e "✅ ${GREEN}found expected version of postgre server running ${expected_postgres_version}${NC}"
+# fi
+
+# echo -e "checking that redis is up and running: redis-cli ping"
+# redis_response=$(redis-cli ping || echo "connection refused")
+# echo ${redis_response}
+# if [[ "${redis_response}" != PONG ]]; then
+#   echo -e "🟡  ${YELLOW}redis seems not to be running - please start ${NC}"
+# fi
+
+if ${NOT_OK}
+then
+  echo -e "\n❌  ${RED}some of your tools are out of date.${NC}"
+  echo -e "${RED}Please fix before continuing${NC}"
+  echo -e "${RED}  alternately try make dev-env${NC}\n"
+  exit 1
+else
+  echo -e "\n${GREEN}"all your tools look fine 🎉 "${NC}\n"
+  exit 0
+fi
