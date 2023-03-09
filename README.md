@@ -29,3 +29,5 @@ https://github.com/failure-driven/kickboxer-vs-ruby/actions/workflows/build.yml)
     - look at http://www.rubymotion.com/ and https://dragonruby.org/ and
       https://github.com/ruboto/ruboto (actual JRuby)
 
+## [Research](REASEARCH.md)
+
