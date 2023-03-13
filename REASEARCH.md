@@ -7,6 +7,340 @@
 - [ ] any compiled JRuby code to try to test limitations of iSH
 - [ ] run a simple app in Android emulator
 
+## Tue 14th March
+
+- [ ] plan
+    - [ ] mruby/c get running
+    - [ ] mruby-esp32 get running
+    - [ ] basics of ESP32: terminal, move servo, talk to screen, connect to wifi, connect to MQTT server
+- code samples
+  - [ ] **terminal**
+  ```c
+  #include <Arduino.h>
+
+  void setup() {
+    Serial.begin(115200);
+  }
+
+  void loop() {
+    Serial.println("Connected ");
+    Serial.println(milli());
+    delay(20);
+  }
+
+  ```
+  - [ ] **move servo**
+  ```c
+  /*
+   servo sweep
+  */
+  #include <Servo.h>          // external library to control a servo
+  #define SWEEP_PERIOD 1000   // 1 second sweep period for servo demo
+
+  const int servoPin = 4;     // SWEEP servo
+
+  Servo myservo;
+
+  void sweepServo() {
+    int millisPosition = millis() % SWEEP_PERIOD;
+    double floatPosition = TWO_PI * (((float) millisPosition ) / SWEEP_PERIOD);
+    int servoPosition = (70 * sin(floatPosition)) + 90;
+    Serial.println(servoPosition);
+    myservo.write(servoPosition);
+  }
+  ```
+  - [ ] **logo on screen**
+  ```c
+  #include <Arduino.h>
+
+  #include <driver/gpio.h>
+  #include <driver/spi_master.h>
+  #include <stdio.h>
+  #include <string.h>
+  #include <U8g2lib.h>
+
+  #include "u8g2_esp32_hal.h"
+  #include "logos.h"
+  // CLK - GPIO14 HSPI CLK
+  #define PIN_CLK GPIO_NUM_14
+  // MOSI - GPIO 13 HSPI MOSI
+  #define PIN_MOSI GPIO_NUM_13
+  // RESET - GPIO 26
+  #define PIN_RESET GPIO_NUM_26
+  // DC - GPIO 27
+  #define PIN_DC GPIO_NUM_27
+  // CS - GPIO 15 HSPI CS0
+  #define PIN_CS GPIO_NUM_15
+  u8g2_t u8g2; // a structure which will contain all the data for one display
+
+  //void task_test_SSD1306(void *ignore) {
+  void task_test_SSD1306() {
+    u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
+    u8g2_esp32_hal.clk   = PIN_CLK;
+    u8g2_esp32_hal.mosi  = PIN_MOSI;
+    u8g2_esp32_hal.cs    = PIN_CS;
+    u8g2_esp32_hal.dc    = PIN_DC;
+    u8g2_esp32_hal.reset = PIN_RESET;
+    u8g2_esp32_hal_init(u8g2_esp32_hal);
+
+    // flip screen, if required
+    // u8g.setRot180();
+    u8g2_Setup_sh1106_128x64_noname_f(
+      &u8g2,
+      U8G2_R2,
+      u8g2_esp32_spi_byte_cb,
+      u8g2_esp32_gpio_and_delay_cb);  // init u8g2 structure
+
+    u8g2_InitDisplay(&u8g2); // send init sequence to the display, display is in sleep mode after this,
+
+    u8g2_SetPowerSave(&u8g2, 0); // wake up display
+    u8g2_ClearBuffer(&u8g2);
+    u8g2_DrawBitmap(&u8g2, 0, 0, 16, 64, failure_driven_bitmap); // 128x64 so 0 X offset full width of 16 bytes wide
+    u8g2_SendBuffer(&u8g2);
+    delay(1000);
+    u8g2_DrawBitmap(&u8g2, 0, 0, 16, 64, failure_driven_2_bitmap); // 128x64 so 0 X offset full width of 16 bytes wide
+    u8g2_SendBuffer(&u8g2);
+  }
+
+  void publishMessage() {
+    u8g2_ClearBuffer(&u8g2);
+    u8g2_DrawBitmap(&u8g2, 0, 0, 9, 20, failure_driven_mini_bitmap); // 67x20 128x64 9 bytes wide
+
+    u8g2_SetFont(&u8g2, u8g2_font_unifont_t_symbols);
+    u8g2_DrawGlyph(&u8g2, 72, 20, 0x2103); // Degree Celsius ℃ or could use 0x00B0 ° and C
+    u8g2_SetFont(&u8g2, u8g2_font_ncenB12_tr);
+    u8g2_DrawStr(&u8g2, 90, 20, "some text");
+
+    u8g2_SetDrawColor(&u8g2, 0);
+    u8g2_DrawBox(&u8g2, 72, 24, 10, 2);
+    // u8g2_SetDrawColor(&u8g2, 1);
+
+    u8g2_SetFont(&u8g2, u8g2_font_ncenB24_tr);
+    char demoString[5];
+    snprintf(demoString, 5, "%03d", (int)42);
+    u8g2_DrawStr(&u8g2, 72, 62, demoString);
+    u8g2_SendBuffer(&u8g2);
+  }
+
+  void setup() {
+    Serial.begin(115200);
+    task_test_SSD1306();
+  }
+
+  void loop() {
+    publishMessage();
+    delay(20);
+  }
+  ```
+
+  - [ ] **connect to wifi**
+  ```c
+  #include "secrets.h"
+  #include <HTTPClient.h>
+  #include <WiFiClientSecure.h>
+
+  WiFiClientSecure net = WiFiClientSecure();
+
+  void connect() {
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+    Serial.println("Connecting to Wi-Fi");
+
+    int count = 0;
+    while (WiFi.status() != WL_CONNECTED) {
+      count++;
+      delay(500);
+      Serial.print(".");
+      if (count % 20 == 0) {
+        count = 0;
+        Serial.println();
+        WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+        Serial.println("Connecting to Wi-Fi");
+      }
+    }
+  }
+
+  void setup() {
+    Serial.begin(115200);
+    connect();
+  }
+
+  void loop() {
+    publishMessage();
+    //  client.loop();
+    delay(20);
+  }
+  ```
+    - assuming a `secrets.h` file like
+    ```c
+    #include <pgmspace.h>
+
+    #define SECRET
+
+    const char WIFI_SSID[] = "";
+    const char WIFI_PASSWORD[] = "";
+    ```
+
+  - [ ] **connect to MQTT server**
+  ```c
+  #include <MQTTClient.h>
+  #include <ArduinoJson.h>
+
+  // The MQTT topics that this device should publish/subscribe
+  #define IOT_PUBLISH_TOPIC   "esp32/pub"
+  #define IOT_SUBSCRIBE_TOPIC "esp32/sub"
+
+  MQTTClient client = MQTTClient(256);
+
+  void connectMQTT() {
+    // if connecting with SSL and Certificates like AWS IoT
+    <!-- net.setCACert(AWS_CERT_CA);
+    net.setCertificate(AWS_CERT_CRT);
+    net.setPrivateKey(AWS_CERT_PRIVATE); -->
+
+    // Connect to the MQTT broker
+    client.begin(IOT_ENDPOINT, 8883, net);
+
+    // Create a message handler
+    client.onMessage(messageHandler);
+    Serial.print("Connecting to AWS IOT");
+    while (!client.connect(THINGNAME)) {
+      Serial.print(".");
+      delay(100);
+    }
+
+    if (!client.connected()) {
+      Serial.println("MQTT IoT Timeout!");
+      return;
+    }
+
+    // Subscribe to a topic
+    client.subscribe(IOT_SUBSCRIBE_TOPIC);
+
+    Serial.println("MQTT IoT Connected!");
+  }
+
+  void publishMessage() {
+    StaticJsonDocument<200> doc;
+    doc["time"] = millis();
+    doc["data"] = 42;
+    char jsonBuffer[512];
+    serializeJson(doc, jsonBuffer); // print to client
+    client.publish(IOT_PUBLISH_TOPIC, jsonBuffer);
+  }
+
+  void messageHandler(String &topic, String &payload) {
+    Serial.println("incoming: " + topic + " - " + payload);
+
+    //  StaticJsonDocument<200> doc;
+    //  deserializeJson(doc, payload);
+    //  const char* message = doc["message"];
+  }
+
+  void setup() {
+    Serial.begin(115200);
+    connectMQTT();
+  }
+
+  void loop() {
+    publishMessage();
+    delay(20);
+  }
+
+  ```
+
+## Mon 13th March
+
+- also attempted to build some mechanical hardware and failed
+- compare the ruby **cruby**
+```ruby
+asdf local ruby 3.2.1
+ruby -v
+ruby 3.2.1 (2023-02-08 revision 31819e82c8) [arm64-darwin22]
+
+irb
+puts 'Hello World!'
+Hello World!
+rss = `ps -o rss= -p #{Process.pid}`.to_f / 1024
+=> 21.3125 # 21MB
+`ps` **rss** - the real memory (resident set) size of the process (in 1024 byte
+units).
+```
+- **mruby**
+```sh
+asdf list-all ruby | ag mr
+asdf install ruby mruby-3.2.0
+asdf local ruby mruby-3.2.0
+ruby -v
+mruby 3.2.0 (2023-02-24)
+```
+    - and run `mirb`
+    ```ruby
+    mirb
+    mirb - Embeddable Interactive Ruby Shell
+
+    > puts 'hello world'
+    hello world
+
+    ps aux | ag mirb
+    ps -o rss= -p 67605
+    => 1952
+    1952.to_f / 1024
+    => 1.90625 # MB
+    ```
+    - [ ] there is also a more complete example of how to compile it
+      https://mruby.org/docs/articles/executing-ruby-code-with-mruby.html
+
+- **mruby/c**
+  ```sh
+  ???
+  ```
+
+  - [ ] note mruby/c use Cypress PSoC5LP [CY8CKIT-059 - development board](https://au.element14.com/cypress-semiconductor/cy8ckit-059/dev-board-psoc-5-prototyping/dp/2476010) board in thier examples
+    - [ ] the [FreeSoC2 Development Board - PSoC5LP](https://www.sparkfun.com/products/13714) might be another option
+  - [ ] specifically look at https://github.com/mruby-esp32/mruby-esp32
+
+- **PicoRuby**
+```sh
+asdf list-all ruby | ag pi
+picoruby-3.0.0
+asdf local ruby picoruby-3.0.0
+
+ruby -v
+PicoRuby 3.0.0
+
+irb
+picoirb> puts 'Hello World!'
+Hello World!
+=> nil
+
+# in terminal
+ps aux | ag pico
+ps -o rss= -p 75430
+  1328
+
+picoirb> 1328.to_f /1024
+=> 1.29688 # MB
+```
+
+## Fri 10th March
+
+- got a hint of [PicoRuby](https://github.com/picoruby/picoruby) from [Paul Joe George - mruby/c RubyConfAU 2020](https://twitter.com/pauljoegeorge)
+    - written by his boss https://github.com/hasumikin
+    - runs on RasPi or a PSoC5LP like a [FreeSoC2 Development Board - PSoC5LP](https://www.sparkfun.com/products/13714)
+    - also intresting build on the sparkfun site using Actobotics - https://www.sparkfun.com/pages/Actobotics pre drilled aluminium parts
+- more repos worth checking out from [Paul Joe George - mruby/c RubyConfAU 2020](https://twitter.com/pauljoegeorge)
+    - https://github.com/pauljoegeorge/m5stickc-mrubyc-template
+    - https://github.com/hasumikin/mrubyc-test
+    - https://github.com/hasumikin/IoT_workshop
+        - hellow world mruby/c
+        - hellow world ESP32
+        - blink LED, take temperature
+        - [ ] multi tasking with mruby/c
+            - https://hackmd.io/@pySgLnmoQRGCAHO4NFCFag/Bkwp8S7oV?type=view
+- [ ] get started in PicoRuby https://hasumikin.com/about/
+
 ## Thu 9th March
 
 - [x] Yuji Yokoo mruby on Dreamcast - https://www.youtube.com/watch?v=ni-1x5Esa_o - some minor snippets of code around video etc - might not be that relevant
@@ -46,7 +380,7 @@
       echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
       apk update
       apk add jruby
-      ```  
+      ```
     - but didn't work
     - ended up downloading manually, extracting it and adding it to the path
       ```
@@ -78,6 +412,10 @@
         irb(main):002:0> rss = `ps -o rss= -p #{Process.pid}`.to_f / 1024
         => 40.59375 # 40MB
         ```
+        **NOTE:** _the above uses Process.pid to get the process id of IRB
+          session and calls out to ps to list that process and the output is
+          **rss** - the real memory (resident set) size of the process (in 1024
+          byte units)._
         - as well as mruby and mruby/c
         - mruby/c is limited to: Array, FalseClass, Fixnum... classes - not many
         - define ruby method from C using mrbc in C - use this to integrate a C library
@@ -168,4 +506,3 @@
 
 - [Building realtime apps with Ruby and WebSockets - Alex Diaconu](https://ably.com/topic/websockets-ruby)
 - [Setting up MQTT with Ruby on Rails - Neha Nakrani - 22 Mar 2020](https://dev.to/nehanakrani/setting-up-mqtt-with-ruby-on-rails-3dbi)
-
