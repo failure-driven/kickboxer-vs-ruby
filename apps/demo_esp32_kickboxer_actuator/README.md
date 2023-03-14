@@ -33,11 +33,34 @@
                         GPIO12 |                  | GPI02
                         GPIO13 |                  | GPI015
                         GND    | EN   _____  BOOT | GND ------- Servo GND
-      Servo V++ ------- VIN    | [ ] / USB \  [ ] | VDD 3V3
+      Servo VCC ------- VIN    | [ ] / USB \  [ ] | VDD 3V3
                                 ------------------
   ```
 
-- [ ]
+- [x] get IIC OLED SSD1306 connected
+  - install `U8g2` library via Arduino -> Tools -> Manage Libraries (⇧⌘I) -> search for "U8g2" by oliver Version 2.33.15
+  - try the demo code from https://tronixstuff.com/2019/08/29/ssd1306-arduino-tutorial/
+
+  ```
+                                ------------------
+                               | |--|  |--|  |--| |
+                        EN     | |  |--|  |--|  | | GPIO23
+                        GPIO36 |  --------------  | GIPO22    I2C_SCL ---- SSD1306 - SCL
+                        GPIO39 | |              | | GIPO1
+                        GPIO34 | | ESP-WROOM-32 | | GPI03
+                        GPIO35 | |              | | GPI021    I2C_SDA ---- SSD1306 - SDA
+                        GPIO32 | |              | | GPI019
+                        GPIO33 | |              | | GPI018
+                        GPIO25 | |              | | GPI05
+                        GPIO26 |  --------------  | GPI017
+                        GPIO27 |                  | GPI016
+                        GPIO14 |                  | GPI04
+                        GPIO12 |                  | GPI02
+                        GPIO13 |                  | GPI015
+                        GND    | RST  _____  BOOT | GND ------------------ SSD1306 - GND
+    SSD1306 - VCC ----- VIN    | [ ] / USB \  [ ] | VDD 3V3
+                                ------------------
+  ```
 
 ## Arduino Software Setup
 

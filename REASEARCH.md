@@ -57,7 +57,7 @@
     myservo.write(servoPosition);
   }
   ```
-  - [ ] **logo on screen**
+  - [x] **logo on screen**
   ```c
   #include <Arduino.h>
 
