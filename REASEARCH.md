@@ -12,6 +12,11 @@
 - Start on Demo ESP32 Kickboxer Actuator
   - time to checkout Arduino IDE 2 https://docs.arduino.cc/software/ide-v2
   - and more importantly CLI https://arduino.github.io/arduino-cli/0.31/
+- what back up equipement would we need?
+  - a Usb C powered hub?
+    - $19 super simple (but not powered) https://www.scorptec.com.au/product/kvm-hubs-&-controllers/hubs/90626-mb-c3h-4k
+    - with a display would be cool https://www.smartcases.com.au/product/multi-port-usb-charger-hub-8-port-fast-charging-quick-charge-qc3-0-pd-charger-led-display-charging-station-mobile-phone-desktop-wall-home/
+    - something with a power bank as well? but it's not a hub? https://www.shargeek.com/products/storm2
 - [ ] plan
     - [ ] mruby/c get running
     - [ ] mruby-esp32 get running
@@ -32,7 +37,7 @@
   }
 
   ```
-  - [ ] **move servo**
+  - [x] **move servo**
   ```c
   /*
    servo sweep

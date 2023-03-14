@@ -14,14 +14,47 @@
     screen -r       # to re-attach
     CTRL-A CTRL \   # to quit the sceen session
     ```
+
+- [x] get a Servo connected
+  ```
+                                ------------------
+                               | |--|  |--|  |--| |
+                        EN     | |  |--|  |--|  | | GPIO23
+                        GPIO36 |  --------------  | GIPO22
+                        GPIO39 | |              | | GIPO1
+                        GPIO34 | | ESP-WROOM-32 | | GPI03
+                        GPIO35 | |              | | GPI021
+                        GPIO32 | |              | | GPI019
+                        GPIO33 | |              | | GPI018
+                        GPIO25 | |              | | GPI05
+                        GPIO26 |  --------------  | GPI017
+                        GPIO27 |                  | GPI016
+                        GPIO14 |                  | GPI04 ----- Servo Signal
+                        GPIO12 |                  | GPI02
+                        GPIO13 |                  | GPI015
+                        GND    | EN   _____  BOOT | GND ------- Servo GND
+      Servo V++ ------- VIN    | [ ] / USB \  [ ] | VDD 3V3
+                                ------------------
+  ```
+
+- [ ]
+
 ## Arduino Software Setup
 
 Assuming using Arduino IDE 1 - https://docs.arduino.cc/software/ide-v1
 
-1. Add additional board managers to get ESP32 working
+1. Connect to the Serial USB port
+   1. Arduino -> Port -> "choose somethingn with usbserial"
+2. Add additional board managers to get ESP32 working
    1. Arduino -> Preferences -> Additional Boards Manager URLS
       ```
       https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
       https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
       http://arduino.esp8266.com/stable/package_esp8266com_index.json
       ```
+3. select the correct board
+   1. Arduino -> Tools -> Board -> ESP32 Arduino -> ESP32 Dev Module
+4. could not use `#include <Arduino.h>    // standard Arduino library` so instead
+   1. Arduino -> Tools -> Manage Libraries (⇧⌘I) -> search for "ESP32Servo" by Kevin Harrington Version 0.12.1
+5. Upload to board using
+   1. Arduino -> Sketch -> Upload (⌘U)
