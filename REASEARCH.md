@@ -9,12 +9,15 @@
 
 ## Tue 14th March
 
+- Start on Demo ESP32 Kickboxer Actuator
+  - time to checkout Arduino IDE 2 https://docs.arduino.cc/software/ide-v2
+  - and more importantly CLI https://arduino.github.io/arduino-cli/0.31/
 - [ ] plan
     - [ ] mruby/c get running
     - [ ] mruby-esp32 get running
     - [ ] basics of ESP32: terminal, move servo, talk to screen, connect to wifi, connect to MQTT server
 - code samples
-  - [ ] **terminal**
+  - [x] **terminal**
   ```c
   #include <Arduino.h>
 
