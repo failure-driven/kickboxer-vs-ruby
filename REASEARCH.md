@@ -141,7 +141,7 @@
   }
   ```
 
-  - [ ] **connect to wifi**
+  - [x] **connect to wifi**
   ```c
   #include "secrets.h"
   #include <HTTPClient.h>
