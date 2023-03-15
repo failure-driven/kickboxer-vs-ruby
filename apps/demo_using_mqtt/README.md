@@ -24,6 +24,40 @@ docker run -it \
     eclipse-mosquitto
 ```
 
+## Make MQTT available on LAN
+
+- tried various options around docker and *macvlan*
+    ```
+    version: "3"
+
+    services:
+      mosquitto:
+        image: eclipse-mosquitto:1.6
+        # network_mode: host
+        volumes:
+          - ./conf:/mosquitto/conf
+        networks:
+          home-lan:
+            ipv4_address: 192.168.68.108
+
+      home-lan:
+        name: home-lan
+        driver: macvlan
+        driver_opts:
+          parent: eth0
+        ipam:
+          config:
+            - subnet: "192.168.68.0/24"
+              gateway: "192.168.68.1"
+    ```
+    - in the end downgrading to Mosquitto 1.5 (from 2) was enough to work on the host network
+    ```
+    services:
+      mosquitto:
+        image: eclipse-mosquitto:1.6
+        network_mode: host
+    ```
+
 ## References
 
 - basics of using `mqtt` gem - https://medium.com/@nehanakrani004/setting-up-mqtt-with-ruby-on-rails-ea52bc63cab4
