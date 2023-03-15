@@ -7,6 +7,33 @@
 - [ ] any compiled JRuby code to try to test limitations of iSH
 - [ ] run a simple app in Android emulator
 
+## Thu 16th March
+
+- talk through the states of the system
+    - WiFi connected
+    - MQTT found and connected
+    - Ping to `kick/manage` to notify actuators exist and are alive
+    - demo showing need for Threads for client as the MQTT client code seems to
+      block?
+    - should probably deal with expiring an actuator if a ping is missed for
+      some number of seconds
+- expand the demo to show device registration
+
+## Wed 15th March
+
+- IP resolution of mac on network
+  ```sh
+  ipconfig getifaddr en0
+  ➜ 192.168.68.108
+
+  # OR
+
+  ipconfig getifaddr $(route -n get default|awk '/interface/ { print $2 }')
+  ➜ 192.168.68.108
+
+  # and using Bonjur, Avahi, MDNS
+  dns-sd -Gv4v6 failure-driven.local
+  ```
 ## Tue 14th March
 
 - Start on Demo ESP32 Kickboxer Actuator
