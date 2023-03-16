@@ -4,3 +4,5 @@ brew "docker"
 brew "docker-compose"
 brew "colima"         # Container runtimes on MacOS (and Linux) with minimal setup
 brew "tmux"           # Terminal multiplexer
+brew "mosquitto"      # Message broker implementing the MQTT protocol
+                      # https://mosquitto.org/

@@ -58,6 +58,14 @@ docker run -it \
         network_mode: host
     ```
 
+## Troubleshooting
+
+can view all messages with the following (installed via brew bundle)
+
+```
+mosquitto_sub -h localhost -t \# -d
+```
+
 ## References
 
 - basics of using `mqtt` gem - https://medium.com/@nehanakrani004/setting-up-mqtt-with-ruby-on-rails-ea52bc63cab4
