@@ -6,6 +6,8 @@
 
 #include <U8x8lib.h>
 
+#include "EspMQTTClient.h"
+// a WiFi.h gets installed with EspMQTTClient and ArduinoJson
 #ifdef ESP32
 #include <WiFi.h>
 #else
@@ -14,6 +16,11 @@
 #include "secrets.h"
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
+
+#include <ESPmDNS.h>
+
+#define IOT_PUBLISH_TOPIC   "kickboxer/pub"
+#define IOT_SUBSCRIBE_TOPIC "kickboxer/sub"
 
 WiFiClientSecure net = WiFiClientSecure();
 
@@ -37,7 +44,7 @@ void sweepServo() {
   int millisPosition = millis() % SWEEP_PERIOD;
   double floatPosition = TWO_PI * (((float) millisPosition ) / SWEEP_PERIOD);
   int servoPosition = (70 * sin(floatPosition)) + 90;
-  Serial.println(servoPosition);
+  //  Serial.println(servoPosition);
   myservo.write(servoPosition);
 }
 
@@ -70,6 +77,22 @@ void connectWifi() {
   }
 }
 
+char * mdns = NULL;
+
+String ipToString(IPAddress ip) {
+  String s = "";
+  for (int i = 0; i < 4; i++)
+    s += i  ? "." + String(ip[i]) : String(ip[i]);
+  return s;
+}
+
+IPAddress resolve_mdns_host(const char * hostname)
+{
+  IPAddress ip = MDNS.queryHost(hostname, 2000); //  2 second timeout
+  Serial.printf("found failure-driven: %s.%s.%s.%s\n", String(ip[0]), String(ip[1]), String(ip[2]), String(ip[3])); // how to IPAddress toString
+  return ip;
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -90,8 +113,8 @@ void setup() {
   u8x8.print(WiFi.macAddress());
 
   connectWifi();
-  u8x8.setCursor(0, 3);
   Serial.println(WiFi.localIP());
+  u8x8.setCursor(0, 3);
   // need to clear row as previous text is longer than IP address
   //  uint8_t U8G2::getBufferCurrTileRow()
   //  for( int r = 0; r < u8x8.getRows(); r++ )
@@ -100,6 +123,22 @@ void setup() {
   //    u8x8.print(" ");
   //  }
   u8x8.print(WiFi.localIP());
+
+  if (!MDNS.begin("ESP32_Browser")) {
+    Serial.println("Error setting up MDNS responder!");
+    while (1) {
+      delay(1000);
+    }
+  }
+  IPAddress ip_address = resolve_mdns_host("failure-driven");
+  Serial.printf("found failure-driven: %s\n", ipToString(ip_address));
+  u8x8.setCursor(0, 4);
+  u8x8.print(ipToString(ip_address));
+
+  // connectMQTT();
+  Serial.println("MQTT connected");
+  u8x8.setCursor(0, 5);
+  u8x8.print("MQTT connected");
 }
 
 // some hints on other things that can be done with the display from
@@ -122,7 +161,7 @@ void loop() {
   // put your main codel here, to run repeatedly:
   sweepServo();
   u8x8.setFont(u8x8_font_px437wyse700b_2x2_r);
-  u8x8.setCursor(0, 4);
+  u8x8.setCursor(0, 6);
   u8x8.print(millis());
   //  delay(1000);
   delay(20);

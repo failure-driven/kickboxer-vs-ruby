@@ -1,5 +1,10 @@
 # Demo ESP32 Kickboxer Actuator
 
+- [ ] get MQTT connected
+  - install Adafruit MQTT Library by Adafruit Version 2.5.2 (and associated dependencies)
+  - also try https://github.com/plapointe6/EspMQTTClient
+  - but going with MQTTClient first https://bitbucket.org/amotzek/arduino/src/master/src/main/cpp/MQTTClient/ but maybe that's not the right one?
+
 - [x] get simple terminal message printed
   - use Arduino -> Tools -> Serial Monitor (⇧⌘M)
   - OR screen
