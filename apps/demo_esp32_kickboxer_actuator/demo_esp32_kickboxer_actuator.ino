@@ -45,14 +45,14 @@ char clientName[] = "ESP32/xx.xx.xx.xx.xx.xx"; // buffer
 U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/ U8X8_PIN_NONE);
 
 const int servoPin = 4;     // SWEEP servo
-Servo myservo;
+Servo myServo;
 
 void sweepServo() {
   int millisPosition = millis() % SWEEP_PERIOD;
   double floatPosition = TWO_PI * (((float) millisPosition ) / SWEEP_PERIOD);
   int servoPosition = (70 * sin(floatPosition)) + 90;
   //  Serial.println(servoPosition);
-  myservo.write(servoPosition);
+  myServo.write(servoPosition);
 }
 
 void connectWifi() {
@@ -108,8 +108,8 @@ void setup() {
   ("ESP32/" + WiFi.macAddress()).toCharArray(clientName, 24); // 6 + 17 + 1 = 24
   ("kick/" + WiFi.macAddress()).toCharArray(actuator_topic, 23); // 4 + 1 +6x2 + 5 + 1 = 23
 
-  myservo.attach(servoPin);
-  myservo.attach(servoPin);
+  myServo.attach(servoPin);
+  myServo.write(180);
 
   u8x8.begin();
   //  u8x8.setFlipMode(1); // Allow the display to be flipped
@@ -201,6 +201,7 @@ void callback(char* topic, byte* message, unsigned int length) {
 
   if (String(topic) == actuator_topic) {
     Serial.println("HIT");
+    myServo.write(90);
     digitalWrite(LED_BUILTIN, HIGH);
     hitStart = millis();
   } else {
@@ -225,12 +226,13 @@ void loop() {
     strcat(buffer, "\"}");
     client.publish("kick/manage", buffer);
   }
-  sweepServo();
   u8x8.setFont(u8x8_font_px437wyse700b_2x2_r);
   u8x8.setCursor(0, 6);
   u8x8.print(millis());
-  if (hitStart > 0 && now - hitStart > 700) {
+  if (hitStart > 0 && now - hitStart > 170) { // manually tuned to 170ms for Turnigy TSS-9 servo
+    // ~150-160ms did not have enough time to always hit
     hitStart = 0;
+    myServo.write(180);
     digitalWrite(LED_BUILTIN, LOW);
   }
   delay(20);
