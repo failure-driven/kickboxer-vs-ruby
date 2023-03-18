@@ -19,10 +19,14 @@
 
 #include <ESPmDNS.h>
 
-#define IOT_PUBLISH_TOPIC   "kickboxer/pub"
-#define IOT_SUBSCRIBE_TOPIC "kickboxer/sub"
+#include <PubSubClient.h>
 
 WiFiClientSecure net = WiFiClientSecure();
+WiFiClient espClient;
+PubSubClient client(espClient);
+long lastMsg = 0;
+char actuator_topic[] = "kick/xx:xx:xx:xx:xx:xx"; // buffer
+char serverIp[] = "xxx.xxx.xxx.xxx"; // buffer
 
 #define SWEEP_PERIOD 500    // 0.5 second sweep period for servo demo
 
@@ -79,13 +83,6 @@ void connectWifi() {
 
 char * mdns = NULL;
 
-String ipToString(IPAddress ip) {
-  String s = "";
-  for (int i = 0; i < 4; i++)
-    s += i  ? "." + String(ip[i]) : String(ip[i]);
-  return s;
-}
-
 IPAddress resolve_mdns_host(const char * hostname)
 {
   IPAddress ip = MDNS.queryHost(hostname, 2000); //  2 second timeout
@@ -93,11 +90,18 @@ IPAddress resolve_mdns_host(const char * hostname)
   return ip;
 }
 
+void connectMQTT(const char * mqtt_server) {
+  client.setServer(mqtt_server, 1883);
+  reconnect();
+  Serial.println("MQTT IoT Connected!");
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.print("Kickboxer Client");
   Serial.println(WiFi.macAddress());
+  ("kick/" + WiFi.macAddress()).toCharArray(actuator_topic, 23); // 4 + 1 +6x2 + 5 + 1 = 23
 
   myservo.attach(servoPin);
   myservo.attach(servoPin);
@@ -130,12 +134,12 @@ void setup() {
       delay(1000);
     }
   }
-  IPAddress ip_address = resolve_mdns_host("failure-driven");
-  Serial.printf("found failure-driven: %s\n", ipToString(ip_address));
+  resolve_mdns_host("failure-driven").toString().toCharArray(serverIp, 16);
+  Serial.printf("found failure-driven: %s\n", serverIp);
   u8x8.setCursor(0, 4);
-  u8x8.print(ipToString(ip_address));
+  u8x8.print(serverIp);
 
-  // connectMQTT();
+  connectMQTT(serverIp);
   Serial.println("MQTT connected");
   u8x8.setCursor(0, 5);
   u8x8.print("MQTT connected");
@@ -157,8 +161,43 @@ void setup() {
 //  u8x8.setFont(u8x8_font_open_iconic_weather_4x4);
 //  u8x8.drawGlyph(0, 4, '@' + c); // C 0..6
 
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("ESP32Client")) {
+      Serial.println("connected");
+      // Subscribe
+      client.subscribe("kick/manage");
+      client.subscribe(actuator_topic);
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
 void loop() {
   // put your main codel here, to run repeatedly:
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+  long now = millis();
+  if (now - lastMsg > 5000) {
+    lastMsg = now;
+    Serial.println("management ping");
+    char buffer[60];
+    strcpy(buffer, "{\"message\":\"OK\",\"actuator\":\"");
+    strcat(buffer, actuator_topic);
+    strcat(buffer, "\"}");
+    client.publish("kick/manage", buffer);
+  }
   sweepServo();
   u8x8.setFont(u8x8_font_px437wyse700b_2x2_r);
   u8x8.setCursor(0, 6);
