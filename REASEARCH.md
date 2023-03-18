@@ -1,11 +1,14 @@
 # RESEARCH
 
+- [ ] rewrite MQTT ruby client as template (for jruby redo)
+- [ ] rewrite MQTT ESP32 C code actuator as template (for mruby redo)
 - [x] arduino servo code
 - [x] arduino MQTT code
 - [ ] NCurses code from Ruby
 - [ ] NCurses JRuby code?
 - [ ] any compiled JRuby code to try to test limitations of iSH
 - [ ] run a simple app in Android emulator
+- [ ] get up and running with ruboto
 
 ## Sat 18th March
 
