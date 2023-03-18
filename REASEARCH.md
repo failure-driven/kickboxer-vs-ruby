@@ -1,11 +1,19 @@
 # RESEARCH
 
-- [ ] arduino servo code
-- [ ] arduino MQTT code
+- [x] arduino servo code
+- [x] arduino MQTT code
 - [ ] NCurses code from Ruby
 - [ ] NCurses JRuby code?
 - [ ] any compiled JRuby code to try to test limitations of iSH
 - [ ] run a simple app in Android emulator
+
+## Sat 18th March
+
+- finally got the ESP32 connected
+- seems like each client needs a different name, not all being "ESP32Client" or **Mosquitto** throws error
+    ```sh
+    Client ESP32Client already connected, closing old connection.
+    ```
 
 ## Thu 16th March
 
@@ -47,7 +55,7 @@
 - [ ] plan
     - [ ] mruby/c get running
     - [ ] mruby-esp32 get running
-    - [ ] basics of ESP32: terminal, move servo, talk to screen, connect to wifi, connect to MQTT server
+    - [x] basics of ESP32: terminal, move servo, talk to screen, connect to wifi, connect to MQTT server
 - code samples
   - [x] **terminal**
   ```c
@@ -217,7 +225,7 @@
     const char WIFI_PASSWORD[] = "";
     ```
 
-  - [ ] **connect to MQTT server**
+  - [x] **connect to MQTT server**
   ```c
   #include <MQTTClient.h>
   #include <ArduinoJson.h>

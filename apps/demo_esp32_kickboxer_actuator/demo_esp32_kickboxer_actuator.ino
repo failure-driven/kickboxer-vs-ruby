@@ -25,9 +25,12 @@ WiFiClientSecure net = WiFiClientSecure();
 WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
+long hitStart = 0;
 char actuator_topic[] = "kick/xx:xx:xx:xx:xx:xx"; // buffer
 char serverIp[] = "xxx.xxx.xxx.xxx"; // buffer
+char clientName[] = "ESP32/xx.xx.xx.xx.xx.xx"; // buffer
 
+#define LED_BUILTIN 2       // ESP32 builtin led
 #define SWEEP_PERIOD 500    // 0.5 second sweep period for servo demo
 
 // Not exactly sure which is needed here ¯\_(ツ)_/¯
@@ -102,6 +105,7 @@ void setup() {
   Serial.begin(115200);
   Serial.print("Kickboxer Client");
   Serial.println(WiFi.macAddress());
+  ("ESP32/" + WiFi.macAddress()).toCharArray(clientName, 24); // 6 + 17 + 1 = 24
   ("kick/" + WiFi.macAddress()).toCharArray(actuator_topic, 23); // 4 + 1 +6x2 + 5 + 1 = 23
 
   myservo.attach(servoPin);
@@ -144,6 +148,7 @@ void setup() {
   Serial.println("MQTT connected");
   u8x8.setCursor(0, 5);
   u8x8.print("MQTT connected");
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 // some hints on other things that can be done with the display from
@@ -167,7 +172,7 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("ESP32Client")) {
+    if (client.connect(clientName)) {
       Serial.println("connected");
       // Subscribe
       client.subscribe("kick/manage");
@@ -196,6 +201,8 @@ void callback(char* topic, byte* message, unsigned int length) {
 
   if (String(topic) == actuator_topic) {
     Serial.println("HIT");
+    digitalWrite(LED_BUILTIN, HIGH);
+    hitStart = millis();
   } else {
     // do nothing
   }
@@ -209,7 +216,7 @@ void loop() {
   client.loop();
 
   long now = millis();
-  if (now - lastMsg > 5000) {
+  if (now - lastMsg > 15000) { // 15 second ping
     lastMsg = now;
     Serial.println("management ping");
     char buffer[60];
@@ -222,6 +229,9 @@ void loop() {
   u8x8.setFont(u8x8_font_px437wyse700b_2x2_r);
   u8x8.setCursor(0, 6);
   u8x8.print(millis());
-  //  delay(1000);
+  if (hitStart > 0 && now - hitStart > 700) {
+    hitStart = 0;
+    digitalWrite(LED_BUILTIN, LOW);
+  }
   delay(20);
 }
