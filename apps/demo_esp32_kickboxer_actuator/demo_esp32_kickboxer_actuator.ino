@@ -92,6 +92,7 @@ IPAddress resolve_mdns_host(const char * hostname)
 
 void connectMQTT(const char * mqtt_server) {
   client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
   reconnect();
   Serial.println("MQTT IoT Connected!");
 }
@@ -178,6 +179,25 @@ void reconnect() {
       // Wait 5 seconds before retrying
       delay(5000);
     }
+  }
+}
+
+void callback(char* topic, byte* message, unsigned int length) {
+  Serial.print("Message arrived on topic: ");
+  Serial.print(topic);
+  Serial.print(". Message: ");
+  String messageTemp;
+
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)message[i]);
+    messageTemp += (char)message[i];
+  }
+  Serial.println();
+
+  if (String(topic) == actuator_topic) {
+    Serial.println("HIT");
+  } else {
+    // do nothing
   }
 }
 
