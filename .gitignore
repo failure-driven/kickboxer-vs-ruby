@@ -6,3 +6,4 @@ rubocop_cache
 .irb_history
 
 .DS_Store
+.idea

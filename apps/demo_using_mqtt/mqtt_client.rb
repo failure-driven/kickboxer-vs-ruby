@@ -1,29 +1,5 @@
 # frozen_string_literal: true
 
-# BUILD OUT FROM SCRATCH
-# take input of MQTT server
-# connect to MQTT
-# listen to managemm topic
-# allow a message to be set to actuatr
-
-# proof of concept -
-# MM work of passsion -
-# client -> MQTT -> hardware
-# client Y MQTT Y hardware - MQTT lib ? - works??????
-#
-# client JRuby on a phone ????? -
-#
-# Ruboto JRuby -> android
-# - connect to MQTT
-# - have dynamic store of actutors as buttons
-# - send an MQTT signal to MQTT server
-# - listen for update
-#
-# Mruby - ardunio C code - how do we chante this to mruby
-# - mruby?
-# - mruby/c
-# - PicoRuby ?
-
 require "io/console" # visual input
 require "mqtt"
 require "JSON"
@@ -33,7 +9,10 @@ class KickClient
 
   def initialize(mqtt_server:, mqtt_port:, ui:)
     # assuming you are on WiFi
+    @events = []
+    @actuators = []
     @ui = ui
+    @ui.set_client(self)
     @mqtt_server = mqtt_server
     @mqtt_port = mqtt_port
     @client = connect_to_mqtt
@@ -45,16 +24,23 @@ class KickClient
       client = MQTT::Client.connect(@mqtt_server, @mqtt_port)
       break # have a client
     rescue SocketError => e
-      @ui.publish_event("having problems finding #{@mqtt_server}")
-      @ui.publish_event(e.message)
-      @ui.publish_event("will retry in 1 second")
+      @events << "having problems finding #{@mqtt_server}"
+      @events << e.message
+      @events << "will retry in 1 second"
+      @ui.events = @events.last(3)
+      @ui.paint
       sleep(1)
     rescue Errno::ECONNREFUSED => e
-      @ui.publish_event("seems like MQTT is not running on port #{@mqtt_port}")
-      @ui.publish_event(e.message)
-      @ui.publish_event("will retry in 1 second")
+      @events << ("seems like MQTT is not running on port #{@mqtt_port}")
+      @events << (e.message)
+      @events << ("will retry in 1 second")
+      @ui.events = @events.last(3)
+      @ui.paint
       sleep(1)
     end
+    @events << "connected to client #{@mqtt_server}:#{@mqtt_port}"
+    @ui.events = @events.last(3)
+    @ui.paint
     client
   end
 
@@ -77,23 +63,90 @@ class KickClient
     @client.subscribe(MANAGMENT_TOPIC)
     Thread.new do
       @client.get do |topic, message|
-        @ui.publish_event([topic, message])
+        @events << [topic, message]
+        @ui.events = @events.last(3)
+        actuator_topic = JSON.parse(message).dig("actuator")
+        if !@actuators.include?(actuator_topic)
+          @actuators << actuator_topic
+          @ui.actuators = @actuators
+        end
+
+        @ui.paint
       end
     end
+  end
+
+  def hit(actuator)
+    @events << "sent hit to #{actuator}"
+    @ui.events = @events.last(3)
+    payload = {action: "hit"}.to_json
+    actuator_topic = actuator # kick/UNIQ_ID
+    @client.publish(actuator_topic, payload, false, 1) # retain = false, qos = 1
   end
 end
 
 class AsciiUi
-  def publish_event(message)
-    puts message
+  ANSI_COLOR1 = "\33[38;5;0;48;5;255m"
+  ANSI_RESET = "\33[m"
+
+  attr_accessor :width
+  attr_accessor :events, :actuators
+
+  def initialize
+    @width = 80
+    @selected_actuator = 0
+    @events = []
+    @actuators = []
+    @client = nil
+  end
+
+  def set_client(client)
+    @client = client
+  end
+
+  def paint
+    puts "\e[H\e[2J"
+
+    paint_in_a_box("actuators", @actuators, @selected_actuator)
+    paint_in_a_box("Event Log", @events, nil)
+  end
+
+  def paint_in_a_box(title, lines, selected_line)
+    output = []
+    output << "╔#{"═" * width}╗"
+    output << sprintf("║ %-#{width - 2}s ║", title)
+    output << "╠#{"═" * width}╣"
+    if lines.empty?
+      output << sprintf("║ %-#{width - 2}s ║", "waiting ...")
+    else
+      lines.each.with_index do |line, index|
+        line_string = []
+        line_string << ANSI_COLOR1 if index == selected_line
+        line_string << sprintf("%-#{width - 2}s", line)
+        line_string << ANSI_RESET if index == selected_line
+        output << sprintf("║ %-#{width - 2}s ║", line_string.join(""))
+      end
+    end
+    output << "╚#{"═" * width}╝"
+    puts output.join("\e[E")
+    puts "\e[E"
   end
 
   def action_input
     action = read_char
     case action
+    when "\e[A", "\eOA", "k" # up
+      @selected_actuator = [@selected_actuator - 1, 0].max
+    when "\e[B", "\eOB", "j" # down
+      @selected_actuator = [@selected_actuator + 1, (@actuators.length - 1)].min
+    when "\r" # Return
+      @client.hit(@actuators[@selected_actuator])
     when "q"
       exit
+    else
+      puts "WTF #{action.inspect}"
     end
+    paint
   end
 
   def read_char
@@ -140,140 +193,3 @@ kick_client = KickClient.new(
 )
 
 kick_client.start
-
-exit
-
-__END__
-events = []
-client = nil
-actuators = []
-
-# 1. remove device if it is no longer alive
-# 2. allow client to send message to device
-# 3. allow device to listen on the topic
-
-ANSI_COLOR1 = "\33[38;5;0;48;5;255m"
-ANSI_COLOR2 = "\33[38;5;255;48;5;0m"
-ANSI_RESET = "\33[m"
-
-actuator_index = 0
-def print_ui(events, actuators, actuator_index)
-  # clear output and go to top left
-  puts "\e[H\e[2J"
-
-  width = 80
-  # status
-  output = []
-  output << "╔#{"═" * width}╗"
-  output << sprintf("║ %-#{width - 4}s ║", "🦵🥊 Status")
-  output << "╠#{"═" * width}╣"
-  ["WiFi connected", "MQTT connected", "PING status"].each do |status|
-    output << sprintf("║ %-#{width - 2}s ║", status)
-  end
-  output << "╚#{"═" * width}╝"
-  output << "\033[0;32m#{"▂" * (width + 2)}\033[0m"
-  output << ""
-
-  output << "╔#{"═" * width}╗"
-  output << sprintf("║ %-#{width - 2}s ║", "Actuators")
-  output << "╠#{"═" * width}╣"
-  if actuators.empty?
-    output << sprintf("║ %-#{width - 2}s ║", "waiting for devices to join ...")
-  else
-    actuators.each.with_index do |actuator, index|
-      actuator_string = []
-      actuator_string << ANSI_COLOR1 if index == actuator_index
-      actuator_string << sprintf("%-#{width - 2}s", actuator)
-      actuator_string << ANSI_RESET if index == actuator_index
-      output << sprintf("║ %-#{width - 2}s ║", actuator_string.join(""))
-    end
-  end
-  output << "╚#{"═" * width}╝"
-
-  output << "\033[0;32m#{"▂" * (width + 2)}\033[0m"
-  output << ""
-
-  output << "╔#{"═" * width}╗"
-  output << sprintf("║ %-#{width - 2}s ║", "Event Log")
-  output << "╠#{"═" * width}╣"
-  events.last(3).each.with_index do |event, index|
-    output << sprintf("║ %-#{width - 2}s ║", event)
-  end
-  output << "╚#{"═" * width}╝"
-
-  # call to action
-  output << ""
-  output << "q to quit, ⬇️  j ⬆️  k for down and up and ⏎ RETURN to select"
-  output << "⬅️  h ➡️  k left and right"
-
-  puts output.join("\e[E")
-  puts "\e[E"
-end
-
-def read_char
-  $stdin.echo = false
-  $stdin.raw!
-
-  input = $stdin.getc.chr
-  if input == "\e"
-    begin
-      input << $stdin.read_nonblock(3)
-    rescue
-      nil
-    end
-    begin
-      input << $stdin.read_nonblock(2)
-    rescue
-      nil
-    end
-  end
-ensure
-  return input
-end
-
-# Separate thread to listen for updates from MQTT server
-management_topic = "kick/manage"
-client.subscribe(management_topic)
-
-Thread.new do
-  client.get do |topic, message|
-    # pp [topic, message]
-    events << [topic, message]
-    actuator_topic = JSON.parse(message).dig("actuator")
-    if !actuators.include?(actuator_topic)
-      actuators << actuator_topic
-    end
-    # TODO: remove actuators if we don't get a sign of life (ping) for 30 seconds
-    print_ui(events, actuators, actuator_index)
-  end
-end
-
-loop do
-  print_ui(events, actuators, actuator_index)
-  c = read_char
-
-  case c
-  when "\e[A", "\eOA", "j"
-    # Up
-    actuator_index = ((actuator_index + 1) >= actuators.length) ? 0 : (actuator_index + 1)
-  when "\e[B", "\eOB", "k"
-    # Down
-    actuator_index = ((actuator_index - 1) < 0) ? (actuators.length - 1) : (actuator_index - 1)
-  when "\e[D", "\eOD", "h"
-    # Left
-  when "\e[C", "\eOC", "l"
-    # Right
-  when "\r"
-    # Return
-    events << "sent hit to #{actuators[actuator_index]}"
-    # TODO actually send a hit message to actuator
-    payload = {action: "hit"}.to_json
-    acutator_topic = actuators[actuator_index] # kick/UNIQ_ID
-    client.subscribe(management_topic)
-    client.publish(acutator_topic, payload, false, 1) # retain = false, qos = 1
-  when "q"
-    exit
-  else
-    puts "WTF #{c.inspect}"
-  end
-end
