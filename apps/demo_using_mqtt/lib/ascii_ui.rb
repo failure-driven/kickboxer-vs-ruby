@@ -28,6 +28,13 @@ class AsciiUi
     paint_in_a_box("Event Log", @events, nil)
   end
 
+  def paint_actuator
+    puts "\e[H\e[2J"
+
+    paint_in_a_box("actuator", ["🥊"], nil)
+    paint_in_a_box("Event Log", @events, nil)
+  end
+
   def paint_in_a_box(title, lines, selected_line)
     output = []
     output << "╔#{"═" * width}╗"
@@ -58,12 +65,23 @@ class AsciiUi
       @selected_actuator = [@selected_actuator + 1, (@actuators.length - 1)].min
     when "\r" # Return
       @client.hit(@actuators[@selected_actuator])
-    when "q"
+    when "\u0003", "q" # CTRL-C ^C
       exit
     else
       puts "WTF #{action.inspect}"
     end
     paint
+  end
+
+  def hit
+    (5..0).step(-1).each do |offset|
+      sleep(0.05)
+      printf "%#{offset}s\e[E\e[U", "🥊"
+    end
+    6.times do |offset|
+      printf "%#{offset}s\e[E\e[U", "🥊"
+      sleep(0.05)
+    end
   end
 
   def read_char
