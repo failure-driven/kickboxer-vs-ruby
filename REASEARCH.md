@@ -9,6 +9,14 @@
 - [ ] any compiled JRuby code to try to test limitations of iSH
 - [ ] run a simple app in Android emulator
 - [ ] get up and running with ruboto
+- [ ] ask chatGPT how to run jruby on android
+  - [ ] http://shoesrb.com/
+  - [ ] http://www.rubymotion.com/
+  - [ ] http://ruboto.org/
+- [ ] run the search on the internet for the following terms: "ruby code on ios"
+  - [ ] https://rubyist.app/
+  - [ ] https://github.com/fastlane/fastlane
+  - [ ] https://github.com/tryzealot/zealot
 
 ## Sat 1st April
 
