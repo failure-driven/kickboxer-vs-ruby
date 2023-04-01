@@ -10,6 +10,74 @@
 - [ ] run a simple app in Android emulator
 - [ ] get up and running with ruboto
 
+## Sat 1st April
+
+- follow steps from https://github.com/mruby-esp32/mruby-esp32
+- needed to install idf.py
+- went to here https://github.com/espressif/esp-idf/tree/master/docs
+- which led us to https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/linux-macos-setup.html
+- ran the following
+```shell
+ 9705  git clone --recursive https://github.com/mruby-esp32/mruby-esp32.git
+ 9707  cd mruby-esp32
+ 9709  mine .
+ 9710  idf.py build
+ 9712  brew install cmake ninja dfu-util
+ 9715  asdf plugin add python
+ 9716  asdf list-all python
+ 9717  asdf install python 3.9.16
+ 9718  cd ..
+ 9719  git clone -b v5.0.1 --recursive https://github.com/espressif/esp-idf.git
+ 9720  cd esp-idf
+ 9721  ./install.sh esp32
+ 9722  . ./export.sh
+ # failed needed to set the python
+ 9723  asdf global python 3.9.16
+ # then we later did this
+ 9738  . ../esp-idf/export.sh
+ 9741  idf.py set-target esp32
+ 
+ 9727  cp -r esp-idf/examples/get-started/hello_world .
+ 9729  cd hello_world
+ 9730  ls /dev/cu.usbserial-0001
+ 9732  idf.py set-target esp32
+ 
+ # didn't need menuconfig for hworld
+ 9743  idf.py set-target esp32
+ 9744  idf.py menuconfig
+ 9745  idf.py build
+ 9746  ls /dev/cu.usbserial-0001
+ 
+ # first build flash of C example testing out idf.py - make sure arduino IDE is not connected
+ 9752  idf.py -p /dev/cu.usbserial-0001 flash
+ 9753  screen /dev/tty.usbserial-0001 115200
+ 
+ 9756  cat main/hello_world_main.c
+ 
+ # now for ruby
+ 9759  cd mruby-esp32
+ 
+ 9761  mine .
+ 9762  idf.py build
+ 9763  idf.py -p /dev/cu.usbserial-0001 flash monitor
+ # note monitor prevents exit so need to kill
+ 9764* ps aux | ag idf
+ 9765* kill 67589
+ # note for next time just use screen
+ 
+ 
+ # before starting MQTT example run mosquitto and monitor
+ docker-compose up # in mqtt dir of our project
+ 9771* mosquitto_sub -h localhost -t \# -d
+ 9781* ipconfig getifaddr en0 # get address of machine
+ 
+ # update SSID, password and IP of MQTT server in demo code 
+ cat mruby-esp32/main/examples/mqtt_publish.rb
+ 9784  idf.py build
+ 9785  idf.py -p /dev/cu.usbserial-0001 flash
+# AND IT WORKED 🎉🤩
+```
+
 ## Sat 18th March
 
 - finally got the ESP32 connected
