@@ -139,8 +139,8 @@ void setup() {
       delay(1000);
     }
   }
-  resolve_mdns_host("failure-driven").toString().toCharArray(serverIp, 16);
-  Serial.printf("found failure-driven: %s\n", serverIp);
+  resolve_mdns_host(MQTT_SERVER_NAME).toString().toCharArray(serverIp, 16);
+  Serial.printf("found %s: %s\n", MQTT_SERVER_NAME, serverIp);
   u8x8.setCursor(0, 4);
   u8x8.print(serverIp);
 
