@@ -7,3 +7,5 @@ rubocop_cache
 
 .DS_Store
 .idea
+
+vendor

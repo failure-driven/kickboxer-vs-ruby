@@ -18,6 +18,15 @@ check-tools:
 asdf-install:
 	asdf install
 
+vendor:
+	mkdir vendor
+
+vendor/mruby-esp32:
+	git clone --recursive https://github.com/mruby-esp32/mruby-esp32.git vendor/mruby-esp32
+
+.PHONY: vendor-install
+vendor-install: vendor vendor/mruby-esp32
+
 .PHONY: install
 install: asdf-install check-tools
 
