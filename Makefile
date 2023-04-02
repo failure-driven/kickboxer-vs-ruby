@@ -27,8 +27,12 @@ vendor/mruby-esp32:
 .PHONY: vendor-install
 vendor-install: vendor vendor/mruby-esp32
 
+.PHONY: brew-bundle
+brew-bundle:
+	brew bundle
+
 .PHONY: install
-install: asdf-install check-tools
+install: asdf-install brew-bundle check-tools
 
 .PHONY: rubocop-fix
 rubocop-fix:

@@ -8,3 +8,6 @@ brew "colima"         # Container runtimes on MacOS (and Linux) with minimal set
 brew "tmux"           # Terminal multiplexer
 brew "arduino-cli"    # Arduino command-line interface
                       # https://github.com/arduino/arduino-cli
+brew "cmake"          # required for ESP-IDF
+brew "ninja"          # required for ESP-IDF
+brew "dfu-util"       # required for ESP-IDF
