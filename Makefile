@@ -24,8 +24,11 @@ vendor:
 vendor/mruby-esp32:
 	git clone --recursive https://github.com/mruby-esp32/mruby-esp32.git vendor/mruby-esp32
 
+vendor/esp-idf:
+	git clone -b v5.0.1 --recursive https://github.com/espressif/esp-idf.git vendor/esp-idf
+
 .PHONY: vendor-install
-vendor-install: vendor vendor/mruby-esp32
+vendor-install: vendor vendor/mruby-esp32 vendor/esp-idf
 
 .PHONY: brew-bundle
 brew-bundle:
