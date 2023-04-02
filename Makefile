@@ -27,8 +27,13 @@ vendor/mruby-esp32:
 vendor/esp-idf:
 	git clone -b v5.0.1 --recursive https://github.com/espressif/esp-idf.git vendor/esp-idf
 
+.PHONY: esp-idf-setup
+esp-idf-setup:
+	pushd vendor/esp-idf && ./install.sh esp32 && popd
+	echo "${GREEN}source ./vendor/esp-idf/export.sh${NC}"
+
 .PHONY: vendor-install
-vendor-install: vendor vendor/mruby-esp32 vendor/esp-idf
+vendor-install: vendor vendor/mruby-esp32 vendor/esp-idf esp-idf-setup
 
 .PHONY: brew-bundle
 brew-bundle:

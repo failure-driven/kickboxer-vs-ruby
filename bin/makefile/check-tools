@@ -87,9 +87,16 @@ done < .tool-versions
 
 if [[ ! $(idf.py) ]]
 then
-  echo -e "🟡  ${YELLOW}missing idf.py ${NC}"
+  echo -e "❌  ${RED}missing idf.py ${NC}"
+else
+  current_version=$(idf.py --version)
+  if [[ ${current_version} != "ESP-IDF v5.0.1" ]]
+  then
+    echo -e "🟡  close enough ${YELLOW} running ${current_version} but expected ESP-IDF v5.0.1${NC}"
+  else
+    echo -e "✅ ${GREEN}found expected version ${current_version}${NC}\n"
+  fi
 fi
-
 
 if ${NOT_OK}
 then
