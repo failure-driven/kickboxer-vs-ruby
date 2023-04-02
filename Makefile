@@ -32,7 +32,7 @@ brew-bundle:
 	brew bundle
 
 .PHONY: install
-install: asdf-install brew-bundle check-tools
+install: asdf-install brew-bundle vendor-install check-tools
 
 .PHONY: rubocop-fix
 rubocop-fix:

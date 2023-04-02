@@ -85,6 +85,12 @@ done < .tool-versions
 #   echo -e "🟡  ${YELLOW}redis seems not to be running - please start ${NC}"
 # fi
 
+if [[ ! $(idf.py) ]]
+then
+  echo -e "🟡  ${YELLOW}missing idf.py ${NC}"
+fi
+
+
 if ${NOT_OK}
 then
   echo -e "\n❌  ${RED}some of your tools are out of date.${NC}"
