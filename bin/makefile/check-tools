@@ -13,7 +13,7 @@ if [[ ! $ASDF_DIR =~ asdf ]]
 then
   echo -e "🟡  ${YELLOW}seems asdf is NOT being used or is NOT setup ¯\_(ツ)_/¯${NC}"
 else
-  echo -e "✅ ${GREEN}adsf installed${NC}"
+  echo -e "✅ ${GREEN}asdf installed${NC}"
 fi
 
 while read tool_version
