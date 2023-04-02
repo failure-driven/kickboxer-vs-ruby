@@ -3,6 +3,30 @@
 [![Build Kickboxer vs Ruby](https://github.com/failure-driven/kickboxer-vs-ruby/actions/workflows/build.yml/badge.svg)](
 https://github.com/failure-driven/kickboxer-vs-ruby/actions/workflows/build.yml)
 
+## TL;DR
+
+```sh
+make
+make install
+source ./vendor/esp-idf/export.sh
+make check-tools
+cd kickboxer-vs-ruby/apps/mruby_actuator
+idf.py build
+# assuming the correct port -p below
+idf.py -p /dev/cu.usbserial-0001 flash
+
+# only output to terminal via serial so use screen to connect
+screen /dev/tty.usbserial-0001 115200
+# to quit screen: CMD-A CMD-\
+
+# run a mosquitto server
+cd ./apps/demo_using_mqtt
+docker-compose up
+
+# monitor messages sent to mosquitto server
+mosquitto_sub -h localhost -t \# -d
+```
+
 ## Goals
 
 - [ ] long journey of ups and downs

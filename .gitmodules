@@ -1,0 +1,3 @@
+[submodule "apps/mruby_actuator/components/mruby_component/mruby"]
+	path = apps/mruby_actuator/components/mruby_component/mruby
+	url = https://github.com/mruby/mruby.git
