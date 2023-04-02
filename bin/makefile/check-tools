@@ -31,6 +31,10 @@ do
   toolname_exec=${toolname}
   toolname_version="-v"
 
+  if [[ ${toolname} == "python" ]]
+  then
+    toolname_version="--version"
+  fi
   if [[ ${toolname} == "nodejs" ]]
   then
     toolname_exec="node"
