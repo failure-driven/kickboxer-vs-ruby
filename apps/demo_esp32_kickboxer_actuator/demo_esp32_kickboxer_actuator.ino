@@ -112,7 +112,7 @@ void setup() {
   myServo.write(180);
 
   u8x8.begin();
-  //  u8x8.setFlipMode(1); // Allow the display to be flipped
+  u8x8.setFlipMode(1); // Allow the display to be flipped
   u8x8.clear();
   u8x8.setFont(u8x8_font_amstrad_cpc_extended_f);
   u8x8.print("Kickboxer");
@@ -217,7 +217,7 @@ void loop() {
   client.loop();
 
   long now = millis();
-  if (now - lastMsg > 15000) { // 15 second ping
+  if (now - lastMsg > 5000) { // 5 second ping
     lastMsg = now;
     Serial.println("management ping");
     char buffer[60];
