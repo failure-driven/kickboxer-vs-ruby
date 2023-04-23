@@ -6,7 +6,7 @@ require "SecureRandom"
 
 class KickMqtt
   MANAGMENT_TOPIC = "kick/manage"
-  def initialize()
+  def initialize
     @events = []
     @start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   end
@@ -93,4 +93,3 @@ class KickActuator < KickMqtt
 
   def actuator_topic = "kick/#{@actuator_id}"
 end
-

@@ -80,4 +80,3 @@ class KickClient
     end
   end
 end
-

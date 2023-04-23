@@ -110,4 +110,3 @@ class AsciiUi
     input
   end
 end
-
