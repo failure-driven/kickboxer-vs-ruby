@@ -39,17 +39,18 @@ class AsciiUi
   def paint_in_a_box(title, lines, selected_line)
     output = []
     output << "╔#{"═" * width}╗"
-    output << sprintf("║ %-.#{width - 2}s ║", title)
+    output << sprintf("║ %-#{width - 2}s ║", title.slice(0, width - 2))
     output << "╠#{"═" * width}╣"
     if lines.empty?
-      output << sprintf("║ %-.#{width - 2}s ║", "waiting ...")
+      output << sprintf("║ %-#{width - 2}s ║", "waiting ...")
     else
       lines.each.with_index do |line, index|
+        line_raw_string = line.respond_to?(:join) ? line.to_s : line
         line_string = []
         line_string << ANSI_COLOR1 if index == selected_line
-        line_string << sprintf("%-.#{width - 2}s", line)
+        line_string << sprintf("%-#{width - 2}s", line_raw_string.slice(0, width - 2))
         line_string << ANSI_RESET if index == selected_line
-        output << sprintf("║ %-.#{width - 2}s ║", line_string.join(""))
+        output << sprintf("║ %-#{width - 2}s ║", line_string.join(""))
       end
     end
     output << "╚#{"═" * width}╝"
