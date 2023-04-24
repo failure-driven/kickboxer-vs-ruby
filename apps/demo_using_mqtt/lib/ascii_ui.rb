@@ -10,7 +10,7 @@ class AsciiUi
   attr_accessor :events, :actuators
 
   def initialize
-    @width = 80
+    set_width
     @selected_actuator = 0
     @events = []
     @actuators = []
@@ -22,6 +22,7 @@ class AsciiUi
   end
 
   def paint
+    set_width
     puts "\e[H\e[2J"
 
     paint_in_a_box("actuators", @actuators, @selected_actuator)
@@ -108,5 +109,10 @@ class AsciiUi
       $stdin.cooked!
     end
     input
+  end
+
+  def set_width
+    height, width = IO.console.winsize
+    @width = width - 2
   end
 end

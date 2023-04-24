@@ -2,7 +2,7 @@
 
 require "util"
 require "mqtt"
-require "JSON"
+require "json"
 
 class KickClient
   MANAGMENT_TOPIC = "kick/manage"
