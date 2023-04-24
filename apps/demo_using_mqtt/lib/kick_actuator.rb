@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "mqtt"
-require "JSON"
+require "json"
 require "SecureRandom"
 
 class KickMqtt
