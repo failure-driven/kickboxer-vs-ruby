@@ -7,6 +7,7 @@ PLATFORMS
   arm-linux-androideabi
   arm64-darwin-21
   arm64-darwin-22
+  universal-java-20
 
 DEPENDENCIES
   mqtt (~> 0.6.0)
