@@ -2,6 +2,13 @@ GEM
   remote: https://rubygems.org/
   specs:
     mqtt (0.6.0)
+    tty-cursor (0.7.1)
+    tty-reader (0.9.0)
+      tty-cursor (~> 0.7)
+      tty-screen (~> 0.8)
+      wisper (~> 2.0)
+    tty-screen (0.8.1)
+    wisper (2.0.1)
 
 PLATFORMS
   arm-linux-androideabi
@@ -11,6 +18,7 @@ PLATFORMS
 
 DEPENDENCIES
   mqtt (~> 0.6.0)
+  tty-reader (~> 0.9.0)
 
 BUNDLED WITH
    2.4.6

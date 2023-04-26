@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require "io/console" # visual input
+require "tty-reader"
+require 'readline'
 
 class AsciiUi
   ANSI_COLOR1 = "\33[38;5;0;48;5;255m"
@@ -15,6 +16,7 @@ class AsciiUi
     @events = []
     @actuators = []
     @client = nil
+    @reader = TTY::Reader.new
   end
 
   def set_client(client)
@@ -65,7 +67,7 @@ class AsciiUi
       @selected_actuator = [@selected_actuator - 1, 0].max
     when "\e[B", "\eOB", "j" # down
       @selected_actuator = [@selected_actuator + 1, (@actuators.length - 1)].min
-    when "\r" # Return
+    when "\r", "\n", "a" # Return or newline or a for Action
       @client.hit(@actuators[@selected_actuator])
     when "\u0003", "q" # CTRL-C ^C
       exit
@@ -87,29 +89,11 @@ class AsciiUi
   end
 
   def read_char
-    input = nil
-    begin
-      $stdin.echo = false
-      $stdin.raw!
+    defined?(JRUBY_VERSION) ? read_with_readline : @reader.read_char
+  end
 
-      input = $stdin.getc.chr
-      if input == "\e"
-        begin
-          input << $stdin.read_nonblock(3)
-        rescue
-          nil
-        end
-        begin
-          input << $stdin.read_nonblock(2)
-        rescue
-          nil
-        end
-      end
-    ensure
-      $stdin.echo = true
-      $stdin.cooked!
-    end
-    input
+  def read_with_readline
+    Readline.readline("", true)
   end
 
   def set_width
