@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "tty-reader"
-require 'readline'
+require "readline"
 
 class AsciiUi
   ANSI_COLOR1 = "\33[38;5;0;48;5;255m"
@@ -97,7 +97,7 @@ class AsciiUi
   end
 
   def set_width
-    height, width = IO.console.winsize
+    _height, width = IO.console.winsize
     @width = width - 2
   end
 end
