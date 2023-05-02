@@ -26,6 +26,6 @@ AllCops:
   Exclude:
     - "vendor/**/*"
     - "**/Brewfile"
-    - "apps/mruby_actuator/components/mruby_component/mruby/**/*"
-    - "apps/mruby_actuator/components/mruby_component/esp32_build_config.rb"
+    - "**/mruby_component/mruby/**/*"
+    - "**/mruby_component/esp32_build_config.rb"
 
