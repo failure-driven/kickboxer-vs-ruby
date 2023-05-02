@@ -1,0 +1,31 @@
+---
+mruby:
+  version: 3.2.0
+  release_no: 30200
+builds:
+  esp32:
+    https://github.com/mruby-esp32/mruby-esp32-system.git:
+      url: https://github.com/mruby-esp32/mruby-esp32-system.git
+      branch: HEAD
+      commit: f2d6c152b6d652f084958cbf903d955e717b3c20
+      version: 0.0.0
+    https://github.com/mruby-esp32/mruby-esp32-wifi.git:
+      url: https://github.com/mruby-esp32/mruby-esp32-wifi.git
+      branch: HEAD
+      commit: 9d6548d34f2be717fb218e8eeeb572c994fad817
+      version: 0.0.0
+    https://github.com/mruby-esp32/mruby-esp32-mqtt.git:
+      url: https://github.com/mruby-esp32/mruby-esp32-mqtt.git
+      branch: HEAD
+      commit: fe46222deb35a48fe5b4048b333ea1a4381e56ae
+      version: 0.0.0
+    https://github.com/mruby-esp32/mruby-io.git:
+      url: https://github.com/mruby-esp32/mruby-io.git
+      branch: HEAD
+      commit: f0a6409d05023879fd73dcb243de5cad4504a6ac
+      version: 0.0.0
+    https://github.com/mruby-esp32/mruby-esp32-gpio.git:
+      url: https://github.com/mruby-esp32/mruby-esp32-gpio.git
+      branch: HEAD
+      commit: ecd0ed1f6f719dcd6658ff43032486e6feabadd0
+      version: 0.0.0

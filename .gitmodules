@@ -7,3 +7,6 @@
 [submodule "apps/examples/mruby_blink2/components/mruby_component/mruby"]
 	path = apps/examples/mruby_blink2/components/mruby_component/mruby
 	url = git@github.com:mruby/mruby.git
+[submodule "apps/examples/mruby_mqtt_blink/components/mruby_component/mruby"]
+	path = apps/examples/mruby_mqtt_blink/components/mruby_component/mruby
+	url = git@github.com:mruby/mruby.git
