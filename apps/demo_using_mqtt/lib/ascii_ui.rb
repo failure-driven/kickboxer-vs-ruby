@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-require "tty-reader"
+begin
+  require "tty-reader"
+rescue LoadError
+  # handled below
+end
 require "readline"
 
 class AsciiUi
@@ -16,7 +20,9 @@ class AsciiUi
     @events = []
     @actuators = []
     @client = nil
-    @reader = TTY::Reader.new
+    if defined?(TTY)
+      @reader = TTY::Reader.new
+    end
   end
 
   def set_client(client)
@@ -27,6 +33,7 @@ class AsciiUi
     set_width
     puts "\e[H\e[2J"
 
+    paint_in_a_box("ruby version: " + RUBY_ENGINE + "-" + RUBY_VERSION, nil, nil)
     paint_in_a_box("actuators", @actuators, @selected_actuator)
     paint_in_a_box("Event Log", @events, nil)
   end
@@ -42,10 +49,10 @@ class AsciiUi
     output = []
     output << "╔#{"═" * width}╗"
     output << sprintf("║ %-#{width - 2}s ║", title.slice(0, width - 2))
-    output << "╠#{"═" * width}╣"
-    if lines.empty?
+    output << "╠#{"═" * width}╣" if !lines.nil?
+    if lines && lines.empty?
       output << sprintf("║ %-#{width - 2}s ║", "waiting ...")
-    else
+    elsif lines
       lines.each.with_index do |line, index|
         line_raw_string = line.respond_to?(:join) ? line.to_s : line
         line_string = []
@@ -89,7 +96,11 @@ class AsciiUi
   end
 
   def read_char
-    defined?(JRUBY_VERSION) ? read_with_readline : @reader.read_char
+    if defined?(JRUBY_VERSION) || @reader.nil?
+      read_with_readline
+    else
+      @reader.read_char
+    end
   end
 
   def read_with_readline
@@ -97,7 +108,11 @@ class AsciiUi
   end
 
   def set_width
-    _height, width = IO.console.winsize
-    @width = width - 2
+    if IO.respond_to?(:console)
+      _height, width = IO.console.winsize
+      @width = width - 2
+    else
+      @width = 50 - 2 # (iPhone iSH)/(Android Terumx) terminal screen
+    end
   end
 end
