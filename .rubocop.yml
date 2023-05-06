@@ -28,4 +28,5 @@ AllCops:
     - "**/Brewfile"
     - "**/mruby_component/mruby/**/*"
     - "**/mruby_component/esp32_build_config.rb"
+    - "apps/demo_using_mqtt/lib/flat_mqtt.rb"
 
