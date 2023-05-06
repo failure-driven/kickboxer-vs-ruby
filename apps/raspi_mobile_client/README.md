@@ -2,6 +2,44 @@
 
 ## Log
 
+### setup screen
+
+```
+$ git clone https://github.com/goodtft/LCD-show
+$ cd LCD-show
+$ sudo ./LCD28-show
+# failed as maybe my first install using 
+#   git clone https://github.com/waveshare/LCD-show.git
+# may have misconfigured something?
+```
+
+### RBENV
+
+- what about `RBENV`
+    - via https://dev.to/konyu/installing-the-latest-version-of-ruby-on-raspberry-pi-3ofk
+
+```sh
+# on RasPi
+$ sudo apt-get install rbenv
+$ export PATH=/home/pi/.rbenv/shims:$PATH
+
+$ rbenv install --list
+
+$ rbenv install jruby-9.2.11.1
+
+# took too long?
+$ rbenv install 2.7.1
+
+$ ruby -v
+
+$ jgem install mqtt
+$ ruby client.rb
+# seems to work
+
+```
+
+### Ruby via ASDF and JRuby
+
 - an existing RasPi connected to the network
 - no java
 
@@ -108,6 +146,8 @@ $ jruby client.rb
 ## RasPi Setup
 
 - debug over UART
+    - via https://www.ibeyonde.com/raspberry-pi-serial-ports.html
+    - and [Raspberry Pi Serial Connect to USB via FTDI - Intermation](https://www.youtube.com/watch?v=ONvNtz2w-qE)
     - mount SD card with RasPi OS
     - edit boot -> config.txt
     - add the following line
