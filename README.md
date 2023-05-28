@@ -3,6 +3,10 @@
 [![Build Kickboxer vs Ruby](https://github.com/failure-driven/kickboxer-vs-ruby/actions/workflows/build.yml/badge.svg)](
 https://github.com/failure-driven/kickboxer-vs-ruby/actions/workflows/build.yml)
 
+## Slides
+
+[slides](./slides/kickboxer-vs-ruby-slides-public.pdf)
+
 ## TL;DR
 
 ```sh
